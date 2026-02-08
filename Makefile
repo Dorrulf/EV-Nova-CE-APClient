@@ -4,13 +4,13 @@ INPUT       = EV_Nova.dat
 OUTPUT      = EV\ Nova.exe
 LDS         = EV_Nova.lds
 
-LDFLAGS    ?= -Wl,--subsystem=windows -Wl,--disable-nxcompat -Wl,--disable-reloc-section -Wl,--enable-stdcall-fixup -static -mcrtdll=msvcrt-os
+LDFLAGS    ?= -Wl,--subsystem=windows -Wl,--disable-nxcompat -Wl,--disable-reloc-section -Wl,--enable-stdcall-fixup -mcrtdll=msvcrt-os
 ASFLAGS    ?= -Iinc
 NFLAGS     ?= -Iinc -f elf
 CFLAGS     ?= -Iinc -O2 -march=pentium4 -Wall -masm=intel
 CXXFLAGS   ?= -Iinc -O2 -march=pentium4 -Wall -masm=intel
 
-LIBS        = -lgdi32 -lgdiplus -lcnc_ddraw
+LIBS        = -lgdi32 -lgdiplus -lcnc_ddraw -L./ -lAPCpp
 
 OBJS        = res/res.o \
 			  sym.o \
@@ -43,7 +43,8 @@ OBJS        = res/res.o \
 			  src/windows-keys-fix.o \
 			  src/wndproc.o \
 			  src/vsnprintf.o \
-			  src/wine.o
+			  src/wine.o \
+			  src/z-apevn-mod.o
 
 CC          = i686-w64-mingw32-gcc
 CXX         = i686-w64-mingw32-g++
