@@ -21,6 +21,8 @@ set "zipFile=%~1"
 set "zipName=%~n1"
 set "targetZipDir=%~dp0%zipName%"
 
+set dataFileName=zzzapdata
+
 :: Step 3: Extract the zip file
 powershell -command "Add-Type -AssemblyName 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('!zipFile!', '!targetZipDir!')"
 
@@ -45,13 +47,19 @@ echo extracting player folder !playerZip! as !playerZipName! to !playerDir!
 
 powershell -command "Add-Type -AssemblyName 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('!playerZip!', '!playerDir!')"
 
-pause 
-
 :: Step 4: Find the text file in the extracted folder
 set "textFile="
-for /r "%targetZipDir%\%playerZipName%" %%f in (*.txt) do (
-	::if "%%f" != "apbitmap.txt"	:: check this statement, probably doesn't work
-	set "textFile=%%f"
+echo searching %playerDir% for txt files - find %dataFileName%
+for /r "%playerDir%" %%f in (*.txt) do (
+	::set "textFile=%%f"
+	set "textFileName=%%~nf"
+	
+	if /I "!textFileName!"=="%dataFileName%" (
+		set "textFile=%%f"
+	) else (
+		:: move the file to root dir of game so the game can find the resource
+		move /y "%%f" "%~dp0"
+	)
 )
 
 echo text file found !textFile!
@@ -61,10 +69,9 @@ echo text file found !textFile!
 :: Check if the text file was found
 if "!textFile!"=="" (
     echo No text file found in the zip folder.
+	pause
     exit /b
 )
-
-pause 
 
 :: Step 5: Call the other executable to transform the text file
 "%~dp0\EVNEW.exe" -torez "!textFile!" "!textFile:~0,-4!.rez"
