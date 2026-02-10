@@ -61,6 +61,11 @@ std::unordered_map<int, int> emittableBits;
 
 //FILE *file;
 
+// credit offset?: *(int *)(DAT_005912a0 + 0xa0)
+//int* credDynamicOffset = (int*)0x00591340;
+int pDynamicOffset = 0x005912a0;
+int credOffset = 0xa0;
+
 int Credits1 = 9900;
 int Credits5 = 9901;
 int Credits10 = 9902;
@@ -84,7 +89,37 @@ void setBit(int bitOffset) {
 	// Handle special cases
 	if (bitOffset >= Credits1 && bitOffset <= Credits500) {
 		//TODO: give credits.
-		std::cout << "Credits received - TODO: Implement " << std::endl;
+		std::cout << "Credits received instead " << std::endl;
+		int giveAmount = 0;
+		if (bitOffset == Credits1) {
+			giveAmount = 10000;
+		} else if (bitOffset == Credits5) {
+			giveAmount = 50000;
+		} else if (bitOffset == Credits10) {
+			giveAmount = 100000;
+		} else if (bitOffset == Credits50) {
+			giveAmount = 500000;
+		} else if (bitOffset == Credits100) {
+			giveAmount = 1000000;
+		} else if (bitOffset == Credits500) {
+			giveAmount = 5000000;
+		} else {
+			giveAmount = 75000; //we should never hit this
+		}
+		//std::cout << "Current credits: " << *credDynamicOffset << std::endl;
+		//*credDynamicOffset = *credDynamicOffset + giveAmount;
+		//int newCreds = *credDynamicOffset + giveAmount;	//just in case above statement didn't work as intended in c++
+		//*credDynamicOffset = newCreds;
+		int pMem = *(int *)(pDynamicOffset);
+		//std::cout << "p mem offset: " << pMem << std::endl;
+		int* credMem = (int *)(pMem + credOffset);
+		//std::cout << "cred mem: " << credMem << " and cred val: " << *credMem << std::endl;
+		int curCreds = *credMem;
+		curCreds += giveAmount;
+		*credMem = curCreds;
+		
+		std::cout << "new credits: " << curCreds << std::endl;
+		
 		return;
 	}
 	//int bitMem = *dynamicOffset + startingOffset + (short)i;	//adding our offset
@@ -97,6 +132,7 @@ void setBit(int bitOffset) {
 	std::cout << "current bit val: " << *bitMem << std::endl;
 	if (*bitMem == 0) {
 		*bitMem = 1;
+		std::cout << "new bit val: " << *bitMem << std::endl;
 	}
 	
 	/*//void* addr = &(*dynamicOffset + bitOffset);	//generic pointer to memory address
