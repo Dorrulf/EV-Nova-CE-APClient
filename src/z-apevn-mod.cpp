@@ -258,7 +258,8 @@ void doAPInit(){
 	char conn_str[256];
 	DWORD result = GetPrivateProfileStringA("AP EVN", "conn_addr", "", conn_str, sizeof(conn_str), ini_path);
 	if (result == 0) {
-		std::cerr << "AP CONFIG ERROR: Did not find IP address" << std::endl;
+		std::cerr << "AP CONFIG ERROR: Did not find IP address - QUITTING" << std::endl;
+		return;
 	}
 	
 	char game_name[64]; //keep username under 64 characters
