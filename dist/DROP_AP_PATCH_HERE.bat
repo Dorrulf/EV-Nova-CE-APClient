@@ -13,6 +13,11 @@ if "%~1"=="" (
 :: Step 0.5: Change the active directory from the drag location to this file's dir.
 ::cd "%~dp0"
 
+:: Step 0.75 (because why not): Clean up old AP game files
+del /f "%~dp0\APCpp_datapkg.cache"
+del /f "%~dp0\aplocids.txt"
+del /f "%~dp0\Nova Plug-ins\zzzapdata.rez"
+
 :: Step 1: Get the zip file path and name
 :: %~1 is the first command, which happens to be the source dir in this case. Doesn't update. So, we need to use a dynamic var instead.
 set "zipFile=%~1"
