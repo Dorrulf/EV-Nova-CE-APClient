@@ -46,7 +46,7 @@ extern "C" {
 //unsigned char truth_cbs[10000]; //as this is a global declaration, c should initialize the indexes... EVN also 0 indexes their bits
 //int startingOffset = 2000;	//We care about control bits 2000 - 2999
 //int *dynamicOffset = (int*)0x005914cc;	//this is where EVN stores the dynamic memory offset for the 10000 control bit range
-int* dynamicOffset = (int*)0x005914cc;	//this is where EVN stores the dynamic memory offset for the 10000 control bit range
+uintptr_t* dynamicOffset = (uintptr_t*)0x005914cc;	//this is where EVN stores the dynamic memory offset for the 10000 control bit range
 //size_t mySize = sizeof(truth_cbs)/sizeof(truth_cbs[0]);
 
 char ini_path[] = ".\\ap_config.ini";
@@ -126,11 +126,14 @@ void setBit(int bitOffset) {
 	//unsigned char* bitMem = *dynamicOffset + startingOffset + (short)i;	//adding our offset
 	//unsigned char* bitMem = *dynamicOffset + bitOffset;	//the offset should actually be baked into the server data, thus the passed int is already adjusted.
 	//*bitOffset = 0x01;	//dereference the pointer based on our offset to get the value at that memory byte. Set it to 1.
-	int* bitMem = reinterpret_cast<int*>(*dynamicOffset + bitOffset);
+	//int* bitMem = reinterpret_cast<int*>(*dynamicOffset + bitOffset);
+	unsigned char* bitMem = reinterpret_cast<unsigned char*>(*dynamicOffset + bitOffset);
 	
 	//suppose we try a bit of safety?
 	std::cout << "current bit val: " << *bitMem << std::endl;
-	if (*bitMem == 0) {
+	//if (*bitMem == 0) {
+	//if (*bitMem != 1) {	// On one hand, very concerned about unexpected values, on the other, I think I keep running into underflowed values for some reason...
+	if (*bitMem == 0) {	// let's return to this now that the casting bug is fixed and see how it works out.
 		*bitMem = 1;
 		std::cout << "new bit val: " << *bitMem << std::endl;
 	}
@@ -380,7 +383,8 @@ void checkBits() {
 		
 		int myKey = pair.first;
 		
-		int* bitMem = reinterpret_cast<int*>(*dynamicOffset + myKey);
+		//int* bitMem = reinterpret_cast<int*>(*dynamicOffset + myKey);
+		unsigned char* bitMem = reinterpret_cast<unsigned char*>(*dynamicOffset + myKey);
 		unsigned char cbit = *bitMem;
 		
 		if (cbit > 0) {
