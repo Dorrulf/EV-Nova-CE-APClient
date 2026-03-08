@@ -110,5 +110,5 @@ if exist "%targetZipDir%" (
 )
 
 echo Process completed!
-::exit /b
-pause
+exit /b
+::pause
