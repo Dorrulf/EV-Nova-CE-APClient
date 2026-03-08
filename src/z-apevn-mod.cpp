@@ -73,6 +73,8 @@ int Credits50 = 9903;
 int Credits100 = 9904;
 int Credits500 = 9905;
 
+int Victory = 9500;
+
 // EVN - before AP
 //void notifyPlr(std::string message) {
 //void notifyPlr(const char* message) {
@@ -85,6 +87,13 @@ void notifyPlr(char* message) {
 // Sets the given bit. Does NOT care about Received/Emit - check that elsewhere.
 void setBit(int bitOffset) {
 	std::cout << "set bit called for bitOffset: " << bitOffset << std::endl;
+	
+	// When we finish the story, we emit a check to the server, which releases and sends us "Victory"
+	// We need to detect that, and then tell the server that was agree, we are complete, and send a status update.
+	if (bitOffset == Victory) {
+		AP_StoryComplete();
+		return;
+	}
 	
 	// Handle special cases
 	if (bitOffset >= Credits1 && bitOffset <= Credits500) {
@@ -377,6 +386,7 @@ void checkBits() {
 	// NOTE: The reissue above should let the game naturally set the bit, so let's not worry about setting it again.
 	// Emit the bit flag IF it is part of the list AP server cares about.
 	for (const auto& pair : emittableBits) {
+		// we've already sent this one, so skip
 		if (pair.second == 1) {
 			continue;
 		}
